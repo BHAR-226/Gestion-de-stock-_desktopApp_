@@ -1,0 +1,11 @@
+admin : BHAR_2006 : 12345678
+USER : BAMBARA : 1234
+
+Probleme à régler :
+- coté adnim la recherche ne donne pas bien.
+la première recherche avec les lettres donnes, mais quand l'id est saisi totalement ça ne donne pas
+- on peut ajouter un appareil facilement mais les caractéristiques sont toujours null
+- ajouter l'affichage des details quand on double-click
+- l'autentification ne tien pas compte de la case du nom de l'utilisateur (majuscule ou pas )!?
+- c'est quoi une exception metier personnalisée
+- penser à hacher les mots de passe au lieu de les comparer en clair principe de securité en production
