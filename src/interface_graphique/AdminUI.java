@@ -100,7 +100,7 @@ public class AdminUI extends JFrame {
 
 
 
-        // TABLEAU DES APPAREILS - Adapté à votre structure
+        // TABLEAU DES APPAREILS
         String[] colonnes = {"ID", "Type", "Marque", "Modèle", "Prix (dh)", "Quantité", "Seuil Alerte", "Description"};
         tableModel = new DefaultTableModel(colonnes, 0) {
             @Override
@@ -120,52 +120,6 @@ public class AdminUI extends JFrame {
         appareilsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         appareilsTable.setRowHeight(30);
         appareilsTable.setAutoCreateRowSorter(true);
-
-        // Rendu conditionnel pour le stock
-        appareilsTable.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-                if (column == 5) { // Colonne Quantité
-                    try {
-                        int quantite = Integer.parseInt(value.toString());
-                        int seuil = 0;
-
-                        // Récupérer le seuil de la même ligne
-                        Object seuilObj = table.getValueAt(row, 6);
-                        if (seuilObj != null) {
-                            seuil = Integer.parseInt(seuilObj.toString());
-                        }
-
-                        if (quantite == 0) {
-                            c.setBackground(new Color(255, 200, 200)); // Rouge clair
-                            c.setForeground(Color.RED);
-                        } else if (quantite <= seuil) {
-                            c.setBackground(new Color(255, 255, 200)); // Jaune clair
-                            c.setForeground(Color.ORANGE);
-                        } else {
-                            c.setBackground(new Color(200, 255, 200)); // Vert clair
-                            c.setForeground(Color.GREEN.darker());
-                        }
-
-                        if (isSelected) {
-                            c.setBackground(table.getSelectionBackground());
-                            c.setForeground(table.getSelectionForeground());
-                        }
-                    } catch (NumberFormatException e) {
-                        // Si erreur de parsing, on garde le rendu par défaut
-                    }
-                } else {
-                    c.setBackground(table.getBackground());
-                    c.setForeground(table.getForeground());
-                }
-
-                setHorizontalAlignment(JLabel.CENTER);
-                return c;
-            }
-        });
 
         JScrollPane scrollPane = new JScrollPane(appareilsTable);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Inventaire des Appareils"));
@@ -263,7 +217,7 @@ public class AdminUI extends JFrame {
             chargerDonneesTest();
         }
     }
-
+//donnée a charger en cas d'echec avec la connection de la base de données
     private void chargerDonneesTest() {
         tableModel.setRowCount(0);
 
@@ -317,9 +271,20 @@ public class AdminUI extends JFrame {
         seuilField.setText("5");
 
         // Description/Caractéristiques
-        JLabel descriptionLabel = new JLabel("Description:");
-        JTextArea descriptionArea = new JTextArea(3, 20);
-        JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
+        JLabel ramLabel = new JLabel("Ram:");
+        JTextField ramField = new JTextField(20);
+
+        JLabel memoireLabel = new JLabel("Memoire:");
+        JTextField memoireField = new JTextField(20);
+
+        JLabel cpuLabel = new JLabel("CPU:");
+        JTextField cpuField = new JTextField(20);
+
+        JLabel gpuLabel = new JLabel("GPU:");
+        JTextField gpuField = new JTextField(20);
+
+        JLabel sizeLabel = new JLabel("Size:");
+        JTextField sizeField = new JTextField(20);
 
         // Ajout des composants
         int row = 0;
@@ -365,11 +330,36 @@ public class AdminUI extends JFrame {
         gbc.gridx = 1;
         formPanel.add(seuilField, gbc);
 
+
         row++;
         gbc.gridx = 0; gbc.gridy = row;
-        formPanel.add(descriptionLabel, gbc);
+        formPanel.add(ramLabel, gbc);
         gbc.gridx = 1;
-        formPanel.add(descriptionScroll, gbc);
+        formPanel.add(ramField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(memoireLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(memoireField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(cpuLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(cpuField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(gpuLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(gpuField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(sizeLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(sizeField, gbc);
 
         // Boutons
         row++;
@@ -429,6 +419,11 @@ public class AdminUI extends JFrame {
 
                     // Créer la caractéristique avec la description
                     Caracteristic caracteristic = new Caracteristic();
+                    caracteristic.setRam(ramField.getText().trim());
+                    caracteristic.setMemoire(memoireField.getText().trim());
+                    caracteristic.setCpu(cpuField.getText().trim());
+                    caracteristic.setGpu(gpuField.getText().trim());
+                    caracteristic.setSize(sizeField.getText().trim());
                     appareil.setCaracteristic(caracteristic);
 
                     // Ajouter via MagasinService
@@ -445,7 +440,6 @@ public class AdminUI extends JFrame {
                         prixField.setText("");
                         quantiteField.setText("");
                         seuilField.setText("5");
-                        descriptionArea.setText("");
 
                         // Recharger les données
                         chargerDonneesBase();
@@ -548,9 +542,20 @@ public class AdminUI extends JFrame {
 
         // Description/Caractéristiques
         Caracteristic caracteristic = appareil.getCaracteristic();
-        JLabel descriptionLabel = new JLabel("Description:");
-        JTextArea descriptionArea = new JTextArea(caracteristic != null ? caracteristic.toString() : "", 3, 20);
-        JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
+        JLabel ramLabel = new JLabel("ram:");
+        JTextField ramField = new JTextField(String.valueOf(caracteristic.getRam()), 20);
+
+        JLabel memoireLabel = new JLabel("memoire:");
+        JTextField memoireField = new JTextField(String.valueOf(caracteristic.getMemoire()), 20);
+
+        JLabel cpuLabel = new JLabel("cpu:");
+        JTextField cpuField = new JTextField(String.valueOf(caracteristic.getCpu()), 20);
+
+        JLabel gpuLabel = new JLabel("gpu:");
+        JTextField gpuField = new JTextField(String.valueOf(caracteristic.getGpu()), 20);
+
+        JLabel sizeLabel = new JLabel("size:");
+        JTextField sizeField = new JTextField(String.valueOf(caracteristic.getSize()), 20);
 
         // Ajout des composants
         int row = 0;
@@ -598,9 +603,33 @@ public class AdminUI extends JFrame {
 
         row++;
         gbc.gridx = 0; gbc.gridy = row;
-        formPanel.add(descriptionLabel, gbc);
+        formPanel.add(ramLabel, gbc);
         gbc.gridx = 1;
-        formPanel.add(descriptionScroll, gbc);
+        formPanel.add(ramField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(memoireLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(memoireField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(cpuLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(cpuField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(gpuLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(gpuField, gbc);
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row;
+        formPanel.add(sizeLabel, gbc);
+        gbc.gridx = 1;
+        formPanel.add(sizeField, gbc);
 
         // Boutons
         row++;
@@ -636,9 +665,14 @@ public class AdminUI extends JFrame {
                     appareil.setSeuilAlerte(Integer.parseInt(seuilField.getText()));
 
                     // Mettre à jour la description
-                    if (appareil.getCaracteristic() == null) {
-                        appareil.setCaracteristic(new Caracteristic());
-                    }
+                    Caracteristic caracteristic1= new Caracteristic();
+                    caracteristic1.setRam(ramField.getText().trim());
+                    caracteristic1.setMemoire(memoireField.getText().trim());
+                    caracteristic1.setCpu(cpuField.getText().trim());
+                    caracteristic1.setGpu(gpuField.getText().trim());
+                    caracteristic1.setSize(sizeField.getText().trim());
+                    appareil.setCaracteristic(caracteristic1);
+
 
                     // Mettre à jour via MagasinService
                     if (magasinService.modifierAppareil(appareil)) {
@@ -740,8 +774,8 @@ public class AdminUI extends JFrame {
         for (int i = tableModel.getRowCount() - 1; i >= 0; i--) {
             boolean match = false;
 
-            // Rechercher dans les colonnes Type (1), Marque (2), Modèle (3)
-            for (int j = 1; j <= 3; j++) {
+            // Rechercher dans les colonnes ID (0), Type (1), Marque (2), Modèle (3)
+            for (int j = 0; j <= 3; j++) {
                 String cellValue = tableModel.getValueAt(i, j).toString().toLowerCase();
                 if (cellValue.contains(searchText)) {
                     match = true;
@@ -888,17 +922,7 @@ public class AdminUI extends JFrame {
 
         if (confirm == JOptionPane.YES_OPTION) {
             dispose();
-            new SelectionUI(); // Assurez-vous que cette classe existe
+            new SelectionUI();
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new AdminUI();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
     }
 }
